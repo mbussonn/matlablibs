@@ -22,7 +22,7 @@ function varargout = collagen_flow_GUI(varargin)
 
 % Edit the above text to modify the response to help collagen_flow_GUI
 
-% Last Modified by GUIDE v2.5 04-Nov-2012 01:43:41
+% Last Modified by GUIDE v2.5 28-Nov-2013 11:07:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -46,7 +46,7 @@ end
 
 
 % --- Executes just before collagen_flow_GUI is made visible.
-function collagen_flow_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
+function collagen_flow_GUI_OpeningFcn(hObject, eventdata, handles, varargin) 
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -64,7 +64,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = collagen_flow_GUI_OutputFcn(hObject, eventdata, handles) 
+function varargout = collagen_flow_GUI_OutputFcn(hObject, eventdata, handles)  %#ok<*INUSL>
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -102,7 +102,7 @@ guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function slider1_CreateFcn(hObject, eventdata, handles)
+function slider1_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU,*INUSD>
 % hObject    handle to slider1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -126,9 +126,9 @@ function load_folder_Callback(hObject, eventdata, handles)
 % hObject    handle to load_folder (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set(handles.slider1,'Value',1)
-d_path='E:/Science/data/benoit/7511_up_0920-1005'
-d_path=uigetdir(d_path)
+set(handles.slider1,'Value',1);
+d_path='E:/Science/data/benoit/7511_up_0920-1005';
+d_path=uigetdir(d_path);
     files=dir([d_path,'/*.png']);
     curr=round(get(handles.slider1,'Value'));
     i=curr;
@@ -164,9 +164,9 @@ function load_tiff_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 set(handles.slider1,'Value',1)
-d_path='E:/Science/data/benoit/7511_up_0920-1005'
+d_path='E:/Science/data/benoit/7511_up_0920-1005';
 files=uigetfile(d_path)
-[d_path, name, ext] = fileparts(files) 
+[d_path, name, ext] = fileparts(files) ;
 info = imfinfo(files);
 num_images = numel(info);
 handle.num_images=num_images;
@@ -304,7 +304,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-flow_struct=save_actual_im(hObject, eventdata, handles)
+flow_struct=save_actual_im(hObject, eventdata, handles);
 
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
@@ -315,7 +315,7 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 %check if the interpolation is checked, and if so it will be run.
     files=handles.files;
     d_path=handles.d_path;
-    num_images=handles.num_images
+    num_images=handles.num_images;
 
 for i=1:num_images-1
     set(handles.slider1,'value',i)
@@ -336,10 +336,10 @@ for i=1:num_images-1
     
     handles.curr=i;
     guidata(hObject, handles);
-    handles=detect_edge(hObject, eventdata, handles)
-    handles=correlate_im(hObject, eventdata, handles)
+    handles=detect_edge(hObject, eventdata, handles);
+    handles=correlate_im(hObject, eventdata, handles);
     guidata(hObject, handles);
-    flow_struct=save_actual_im(hObject, eventdata, handles)
+    flow_struct=save_actual_im(hObject, eventdata, handles);
 end
 
 %Now we check if the user want the interpolation, and if so we will run it.
@@ -366,7 +366,7 @@ function size_er_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of size_er as text
 %        str2double(get(hObject,'String')) returns contents of size_er as a double
-handles=detect_edge(hObject, eventdata, handles)
+handles=detect_edge(hObject, eventdata, handles);
 guidata(hObject, handles);
 
 
@@ -392,7 +392,7 @@ function size_dil_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of size_dil as text
 %        str2double(get(hObject,'String')) returns contents of size_dil as a double
 
-handles=detect_edge(hObject, eventdata, handles)
+handles=detect_edge(hObject, eventdata, handles);
 guidata(hObject, handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -417,7 +417,7 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns popupmenu1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu1
 
-handles=detect_edge(hObject, eventdata, handles)
+handles=detect_edge(hObject, eventdata, handles);
 guidata(hObject, handles);
 % --- Executes during object creation, after setting all properties.
 function popupmenu1_CreateFcn(hObject, eventdata, handles)
@@ -441,7 +441,7 @@ function remove_edge_p_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of remove_edge_p as text
 %        str2double(get(hObject,'String')) returns contents of remove_edge_p as a double
 
-handles=detect_edge(hObject, eventdata, handles)
+handles=detect_edge(hObject, eventdata, handles);
 guidata(hObject, handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -645,7 +645,7 @@ function flow_struct=save_actual_im(hObject, eventdata, handles)
 
 im=handles.im;
 files=handles.files;
-curr=round(get(handles.slider1,'value'))
+curr=round(get(handles.slider1,'value'));
 %First I arrange the structure
 flow_struct.d_path=handles.d_path;
 flow_struct.curr=curr;
@@ -975,7 +975,16 @@ function interpolate_flow_nested(handles)
 filter_versioninfo='advanced_display_and_filter_v1_5';
     path=handles.d_path;
     mue2pix_ratio=str2num(get(handles.edit_mue2pix,'String'));
-    fps=1/str2num(get(handles.edit_sec_per_frame,'String'));
+    
+    
+    s = str2double(get(handles.edit_sec_per_frame,'String'));
+    m = str2double(get(handles.min_per_frame,'String'));
+    h = str2double(get(handles.hrs_per_frame,'String'));
+    
+    fps = 1/(s+60*m+3600*h);
+    
+    clear s m h;
+    
     xcorr_thresh=str2num(get(handles.c_thresh,'String'));
     k_size=2*(ceil(0.5*str2num(get(handles.edit_kernel_size,'String'))/mue2pix_ratio ));
     k_sigma=2*(ceil(0.5*str2num(get(handles.edit_kernel_sigma,'String'))/mue2pix_ratio ));
@@ -1145,3 +1154,49 @@ function invert_image_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of invert_image
+
+
+
+function min_per_frame_Callback(hObject, eventdata, handles)
+% hObject    handle to min_per_frame (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of min_per_frame as text
+%        str2double(get(hObject,'String')) returns contents of min_per_frame as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function min_per_frame_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to min_per_frame (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function hrs_per_frame_Callback(hObject, eventdata, handles)
+% hObject    handle to hrs_per_frame (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of hrs_per_frame as text
+%        str2double(get(hObject,'String')) returns contents of hrs_per_frame as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function hrs_per_frame_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to hrs_per_frame (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
