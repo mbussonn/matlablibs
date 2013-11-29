@@ -47,70 +47,70 @@ end
 
 % --- Executes just before collagen_flow_GUI is made visible.
 function collagen_flow_GUI_OpeningFcn(hObject, eventdata, handles, varargin) 
-% This function has no output args, see OutputFcn.
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to collagen_flow_GUI (see VARARGIN)
+    % This function has no output args, see OutputFcn.
+    % hObject    handle to figure
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    % varargin   command line arguments to collagen_flow_GUI (see VARARGIN)
 
-% Choose default command line output for collagen_flow_GUI
-handles.output = hObject;
+    % Choose default command line output for collagen_flow_GUI
+    handles.output = hObject;
 
-% Update handles structure
-guidata(hObject, handles);
+    % Update handles structure
+    guidata(hObject, handles);
 
-% UIWAIT makes collagen_flow_GUI wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+    % UIWAIT makes collagen_flow_GUI wait for user response (see UIRESUME)
+    % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
 function varargout = collagen_flow_GUI_OutputFcn(hObject, eventdata, handles)  %#ok<*INUSL>
-% varargout  cell array for returning output args (see VARARGOUT);
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    % varargout  cell array for returning output args (see VARARGOUT);
+    % hObject    handle to figure
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
 
-% Get default command line output from handles structure
-varargout{1} = handles.output;
+    % Get default command line output from handles structure
+    varargout{1} = handles.output;
 
 
-% --- Executes on slider movement.
-function slider1_Callback(hObject, eventdata, handles)
-% hObject    handle to slider1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    % --- Executes on slider movement.
+    function slider1_Callback(hObject, eventdata, handles)
+    % hObject    handle to slider1 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-files=handles.files;
-d_path=handles.d_path;
-    i=round(get(handles.slider1,'Value'));
-    im=imread([d_path,'/',files(i).name]);     
-    im2=imread([d_path,'/',files(i+1).name]);
-    if length(size(im))>2
-        handles.im=im(:,:,get(handles.listbox_color,'Value'));       
-        handles.im2=im2(:,:,get(handles.listbox_color,'Value'));
-    else
-        handles.im=im;     
-        handles.im2=im2;
-    end
+    % Hints: get(hObject,'Value') returns position of slider
+    %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    files=handles.files;
+    d_path=handles.d_path;
+        i=round(get(handles.slider1,'Value'));
+        im=imread([d_path,'/',files(i).name]);     
+        im2=imread([d_path,'/',files(i+1).name]);
+        if length(size(im))>2
+            handles.im=im(:,:,get(handles.listbox_color,'Value'));       
+            handles.im2=im2(:,:,get(handles.listbox_color,'Value'));
+        else
+            handles.im=im;     
+            handles.im2=im2;
+        end
 
-    
-handles=detect_edge(hObject, eventdata, handles)
-guidata(hObject, handles);
+
+    handles=detect_edge(hObject, eventdata, handles)
+    guidata(hObject, handles);
 
 
 
 % --- Executes during object creation, after setting all properties.
 function slider1_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU,*INUSD>
-% hObject    handle to slider1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
+    % hObject    handle to slider1 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
+    % Hint: slider controls usually have a light gray background.
+    if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor',[.9 .9 .9]);
+    end
 
 
 % --------------------------------------------------------------------
@@ -1010,15 +1010,15 @@ function interpolate_flow_nested(handles)
     % %
     %Here we create the folder where we will later store the interpolation
     %images and matlab files
-    mkdir([path,'/filtered_overlay_im']);
-    mkdir([path,'/filtered_overlay_im/plus_actin']);
-    mkdir([path,'/filtered_overlay_data']);
+    mkdir([path,filesep,'filtered_overlay_im']);
+    mkdir([path,filesep,'filtered_overlay_im',filesep,'plus_actin']);
+    mkdir([path,filesep,'filtered_overlay_data']);
 
 
     %first we will read the file list:
-    files=dir([path,'/data/*mat'])
+    files=dir([path,filesep,'data',filesep,'*mat'])
     for i=1:length(files)
-        load([path,'/data/',files(i).name]);
+        load([path,filesep,'data',filesep,files(i).name]);
         flow_data(i)=flow_struct;
         clear list
         %We directly switch from pixel per image to the mue/min
@@ -1102,10 +1102,10 @@ function interpolate_flow_nested(handles)
             if(list(i,5)>xcorr_thresh) %&& th_diff<max_angle)
                 x_c=list(i,1);
                 y_c=list(i,2);
-                lb_y=y_c-(k_size/2);
-                ub_y=y_c+(k_size/2);
-                lb_x=x_c-(k_size/2);
-                ub_x=x_c+(k_size/2);
+                %lb_y=y_c-(k_size/2);
+                %ub_y=y_c+(k_size/2);
+                %lb_x=x_c-(k_size/2);
+                %ub_x=x_c+(k_size/2);
                 %build the convolution matrix and the normalization matrix 
                 im_x(y_c-(k_size/2):y_c+(k_size/2),x_c-(k_size/2):x_c+(k_size/2),:)=list(i,5)*list(i,3)*kernel_3D+im_x(y_c-(k_size/2):y_c+(k_size/2),x_c-(k_size/2):x_c+(k_size/2),:);
                 im_y(y_c-(k_size/2):y_c+(k_size/2),x_c-(k_size/2):x_c+(k_size/2),:)=list(i,5)*list(i,4)*kernel_3D+im_y(y_c-(k_size/2):y_c+(k_size/2),x_c-(k_size/2):x_c+(k_size/2),:);
