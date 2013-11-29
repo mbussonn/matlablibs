@@ -548,97 +548,97 @@ guidata(hObject, handles);
 
 % --- Executes on slider movement.
 function handles=detect_edge(hObject, eventdata, handles)
-% hObject    handle to slider1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    % hObject    handle to slider1 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-curr=round(get(handles.slider1,'Value'));
-set(handles.text1,'String',['Image: ',num2str(curr)]);
-axes(handles.image);
-handles.curr;
-im=handles.im;
-im=im;
-imshow(im);
-guidata(hObject, handles);
-
-
-axes(handles.edge);
-level = graythresh(im);
-
-%size_g=55;%size of the gaussian kernel
-size_g=str2num(get(handles.size_er,'String'));
-sig=1;%sigma of the gaussian kernel
-d=10;%edge rechtalnges to compensate inhomogenous illumination
-%t=1;%should I invert?
-t=get(handles.invert_image,'Value');
-ones1=5;%first imclose, removes smal particle
-%ones2=50;%second imclose, removes particles at the end of procedure and clese the contour
-ones2=str2num(get(handles.size_dil,'String'));
-%min_size=50;%remove particles after threshold
-min_size=str2num(get(handles.remove_edge_p,'String'));
-
-axes(handles.gran);
-%I want that center is bright, so inverse if necessary
-if t==1
-    im=double(im);
-    %im=uint16((im-2^16)*-1);
-    im=uint8((im-2^8)*-1);
+    % Hints: get(hObject,'Value') returns position of slider
+    %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    curr=round(get(handles.slider1,'Value'));
+    set(handles.text1,'String',['Image: ',num2str(curr)]);
+    axes(handles.image);
+    handles.curr;
+    im=handles.im;
+    im=im;
+    imshow(im);
+    guidata(hObject, handles);
 
 
-end
+    axes(handles.edge);
+    level = graythresh(im);
 
-%Now I correct for assymtric illumination. I take the corners and
-%intermolate a map for normalisation
+    %size_g=55;%size of the gaussian kernel
+    size_g=str2num(get(handles.size_er,'String'));
+    sig=1;%sigma of the gaussian kernel
+    d=10;%edge rechtalnges to compensate inhomogenous illumination
+    %t=1;%should I invert?
+    t=get(handles.invert_image,'Value');
+    ones1=5;%first imclose, removes smal particle
+    %ones2=50;%second imclose, removes particles at the end of procedure and clese the contour
+    ones2=str2num(get(handles.size_dil,'String'));
+    %min_size=50;%remove particles after threshold
+    min_size=str2num(get(handles.remove_edge_p,'String'));
 
-[x,y]=size(im);
-I(1,1)=mean(reshape(im(1:d,1:d),1,d^2));
-I(2,2)=mean(reshape(im(x-d+1:x,y-d+1:y),1,d^2));
-I(2,1)=mean(reshape(im(1:d,y-d+1:y),1,d^2));
-I(1,2)=mean(reshape(im(x-d+1:x,1:d),1,d^2));
+    axes(handles.gran);
+    %I want that center is bright, so inverse if necessary
+    if t==1
+        im=double(im);
+        %im=uint16((im-2^16)*-1);
+        im=uint8((im-2^8)*-1);
 
-%now I interpolare the normalisation matrix
-[X,Y] = meshgrid(1:x-1:x,1:y-1:y);
-Z = I;
-[XI,YI] = meshgrid(1:x,1:y);
-ZI = interp2(X,Y,Z,XI,YI);
 
-%now I normalize the image
-%make sure the image is 8bit
-im=uint8(im);
-im_n=im-(uint8(ZI')-min(min(ZI)));
+    end
 
-%# Create the gaussian filter with hsize = [5 5] and sigma = 2
-G = fspecial('gaussian',[size_g size_g],sig);
-%# Filter it
-im_blur = imfilter(im_n,G,'same');
-% now threshold
-graythresh(im_blur)
-im_th=im2bw(im_blur, graythresh(im_blur));
+    %Now I correct for assymtric illumination. I take the corners and
+    %intermolate a map for normalisation
 
-%now I clean up
-bw2 = imfill(im_th,'holes');
-%bw3 = imopen(bw2, ones(ones1,ones1));
-bw3 = imopen(im_th, ones(ones1,ones1));
-bw4 = bwareaopen(bw3, min_size);
-bw4b=(imclose(bw4,ones(ones2,ones2)));
-bw5=(imfill(bw4b,'holes'));
-imshow(im_n)
-%finally remove all particles that don't take up half of the total white
-%pixels numbers
-bw6= bwareaopen(bw5, round(sum(sum(bw5))/2));
+    [x,y]=size(im);
+    I(1,1)=mean(reshape(im(1:d,1:d),1,d^2));
+    I(2,2)=mean(reshape(im(x-d+1:x,y-d+1:y),1,d^2));
+    I(2,1)=mean(reshape(im(1:d,y-d+1:y),1,d^2));
+    I(1,2)=mean(reshape(im(x-d+1:x,1:d),1,d^2));
 
-bw6_perim = bwperim(bw6);
-overlay1 = imoverlay(im, bw6_perim, [1 0 0]);
+    %now I interpolare the normalisation matrix
+    [X,Y] = meshgrid(1:x-1:x,1:y-1:y);
+    Z = I;
+    [XI,YI] = meshgrid(1:x,1:y);
+    ZI = interp2(X,Y,Z,XI,YI);
 
-axes(handles.image);
-imshow(overlay1);
+    %now I normalize the image
+    %make sure the image is 8bit
+    im=uint8(im);
+    im_n=im-(uint8(ZI')-min(min(ZI)));
 
-handles.BW2=(bw6-1)*-1;
-handles.im_e=im;
+    %# Create the gaussian filter with hsize = [5 5] and sigma = 2
+    G = fspecial('gaussian',[size_g size_g],sig);
+    %# Filter it
+    im_blur = imfilter(im_n,G,'same');
+    % now threshold
+    graythresh(im_blur)
+    im_th=im2bw(im_blur, graythresh(im_blur));
 
-guidata(hObject, handles);
+    %now I clean up
+    bw2 = imfill(im_th,'holes');
+    %bw3 = imopen(bw2, ones(ones1,ones1));
+    bw3 = imopen(im_th, ones(ones1,ones1));
+    bw4 = bwareaopen(bw3, min_size);
+    bw4b=(imclose(bw4,ones(ones2,ones2)));
+    bw5=(imfill(bw4b,'holes'));
+    imshow(im_n)
+    %finally remove all particles that don't take up half of the total white
+    %pixels numbers
+    bw6= bwareaopen(bw5, round(sum(sum(bw5))/2));
+
+    bw6_perim = bwperim(bw6);
+    overlay1 = imoverlay(im, bw6_perim, [1 0 0]);
+
+    axes(handles.image);
+    imshow(overlay1);
+
+    handles.BW2=(bw6-1)*-1;
+    handles.im_e=im;
+
+    guidata(hObject, handles);
 
 
 function flow_struct=save_actual_im(hObject, eventdata, handles)
@@ -993,7 +993,6 @@ function interpolate_flow_nested(handles)
     
     max_flow_vel=str2double(get(handles.edit_max_flow_vel,'String'));
     max_flow_vel = max_flow_vel*handles.length_scale_unit/handles.time_scale_unit;
-    display(sprintf('max flow velocity: %f µm/min', max_flow_vel));
     flow_field_arrow_distance=str2num(get(handles.edit_arrow_distance,'String'));
  
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
