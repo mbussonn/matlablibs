@@ -1,5 +1,46 @@
-function create_retro_flow_image(rf_path,im,bin_im,index,x_flow,y_flow,x_shift,y_shift,mue2pix_ratio,fps,max_r_flow,flow_field_arrow_distance)
-warning off MATLAB:divideByZero
+function create_retro_flow_image(rf_path,im,bin_im,index,x_flow,y_flow,x_shift,y_shift,mue2pix_ratio,fps,max_r_flow,flow_field_arrow_distance, varargin)
+
+nVarargs = length(varargin)
+if nVarargs > 0 
+    lunit_str = varargin{1};
+    tunit_str = varargin{2};
+else
+    lunit_str = 'µm';
+    tunit_str = 'minute';
+end
+
+switch lunit_str
+    case 'm'
+        length_scale_unit = 1e6;
+    case 'mm'
+        length_scale_unit = 1e3;
+    case 'µm'
+        length_scale_unit = 1;
+    case 'nm'
+        length_scale_unit = 1e-3;    
+    otherwise
+        assert(false,'unknown lenghtscale')
+end
+
+
+
+
+switch tunit_str
+    case 'day'
+        time_scale_unit = 1440;
+    case 'hour'
+        time_scale_unit = 60;
+    case 'minute'
+        time_scale_unit = 1;
+    case 'second'
+        time_scale_unit = 1/60;
+    otherwise
+        assert(false,['unknown timescale:' tunit_str])
+end
+
+
+
+
 hold off;
 tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,9 +123,10 @@ x_flow=x_flow_i;y_flow=y_flow_i;
 %First make the color coded growth retrograde flow
 r_flow(isnan(r_flow))=0;
 %r_flow=r_flow(x_shift+1:end,y_shift+1:end);
-imshow(r_flow)
+imshow(r_flow/length_scale_unit*time_scale_unit)
 colormap('jet')
-set(gca,'CLim',[0,max_r_flow])
+set(gca,'CLim',[0,max_r_flow/length_scale_unit*time_scale_unit])
+display(max_r_flow/length_scale_unit*time_scale_unit)
 hold on
 
 %now get and draw the flow field arrows
@@ -92,7 +134,7 @@ plot_data=generate_plot_normalized(x_flow,y_flow,flow_field_arrow_distance);
 hold on
 quiver(plot_data(:,1),plot_data(:,2),plot_data(:,3),plot_data(:,4),0.3,'k');
 cb = colorbar();
-ylabel(cb,'spped µm/min')
+ylabel(cb,['speed ' lunit_str '/' tunit_str])
 
 
 %Draw a 10µm scale bar

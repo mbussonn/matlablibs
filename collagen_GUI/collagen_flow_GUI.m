@@ -1118,7 +1118,7 @@ function interpolate_flow_nested(handles)
         if j>startframe-1+k_size_temp/2
             i=j-k_size_temp/2;
             %create the image, plus get the filtered final results
-            create_retro_flow_image(path,flow_data(j).im,flow_data(j).edge_im,i,im_x_act,im_y_act,x_shift,y_shift,mue2pix_ratio,fps,max_flow_vel,flow_field_arrow_distance)
+            create_retro_flow_image(path,flow_data(j).im,flow_data(j).edge_im,i,im_x_act,im_y_act,x_shift,y_shift,mue2pix_ratio,fps,max_flow_vel,flow_field_arrow_distance, handles.length_scale_str, handles.time_scale_str)
            % [final_res_filtered,min_pr,max_pr,max_r_flow]=advanced_create_il_v1_5(rf_path,i,im_x_act,im_y_act,final_res,x_shift,y_shift,mue2pix_ratio);
         end
         %delete first time layer of convolution array block and define next one
@@ -1210,12 +1210,16 @@ function edit_length_scale_unit_Callback(hObject, eventdata, handles)
     switch contents{get(hObject,'Value')}
         case 'm'
             handles.length_scale_unit = 1e6;
+            handles.length_scale_str = 'm';
         case 'mm'
             handles.length_scale_unit = 1e3;
+            handles.length_scale_str = 'mm';
         case 'µm'
             handles.length_scale_unit = 1;
+            handles.length_scale_str = 'µm';
         case 'nm'
             handles.length_scale_unit = 1e-3;    
+            handles.length_scale_str = 'nm';
         otherwise
             assert(false,'unknown lenghtscale')
     end
@@ -1228,12 +1232,16 @@ function edit_time_scale_unit_Callback(hObject, eventdata, handles)
     switch contents{get(hObject,'Value')}
         case 'day'
             handles.time_scale_unit = 1440;
+            handles.time_scale_str = 'day';
         case 'hour'
             handles.time_scale_unit = 60;
+            handles.time_scale_str = 'hour';
         case 'minute'
             handles.time_scale_unit = 1;
+            handles.time_scale_str = 'minutes';
         case 'second'
             handles.time_scale_unit = 1/60;
+            handles.time_scale_str = 'second';
         otherwise
             assert(false,'unknown timescale')
             
@@ -1268,6 +1276,7 @@ function edit_time_scale_unit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
     handles.time_scale_unit = 1440;
+    handles.time_scale_unit = 'day';
     guidata(hObject, handles);
     
 
@@ -1286,4 +1295,5 @@ function edit_length_scale_unit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
     handles.length_scale_unit = 1e6;
+    handles.length_scale_unit = 'm';
     guidata(hObject, handles);
