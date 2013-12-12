@@ -1276,7 +1276,7 @@ function edit_time_scale_unit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
     handles.time_scale_unit = 1440;
-    handles.time_scale_unit = 'day';
+    handles.time_scale_str = 'day';
     guidata(hObject, handles);
     
 
@@ -1295,5 +1295,5 @@ function edit_length_scale_unit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
     handles.length_scale_unit = 1e6;
-    handles.length_scale_unit = 'm';
+    handles.length_scale_str = 'm';
     guidata(hObject, handles);
