@@ -132,10 +132,16 @@ hold on
 %now get and draw the flow field arrows
 plot_data=generate_plot_normalized(x_flow,y_flow,flow_field_arrow_distance);
 hold on
+
+out=[rf_path,'/filtered_overlay_im','/all_overlay',num2str(index+1000),'all_filt.png'];
+print(h,'-dpng','-r150',out);
+
 quiver(plot_data(:,1),plot_data(:,2),plot_data(:,3),plot_data(:,4),0.3,'k');
 cb = colorbar();
 ylabel(cb,['speed ' lunit_str '/' tunit_str])
 
+out2=[rf_path,'/filtered_overlay_im','/all_overlay',num2str(index+1000),'all_filt-quiver.png'];
+print(h,'-dpng','-r150',out2);
 
 %Draw a 10µm scale bar
 fill([x_max-x_shift-5-10/mue2pix_ratio,x_max-x_shift-5-10/mue2pix_ratio,x_max-5-x_shift,x_max-5],[5,15,15,5],'w')
@@ -144,20 +150,20 @@ fill([x_max-x_shift-5-10/mue2pix_ratio,x_max-x_shift-5-10/mue2pix_ratio,x_max-5-
 
 %Save the images, the display_edge_array, and of course the final_results_out
 
-out=[rf_path,'/filtered_overlay_im','/all_overlay',num2str(index+1000),'all_filt.png'];
-print(h,'-dpng','-r150',out);
 %now correct for the stupid matlab exporting and resizeing
-im_corr=imread(out);
-im_bw=mean(im_corr,3);
-x_mean=mean(im_bw,2);
-y_mean=mean(im_bw,1);
-x_im_f=find(~(x_mean==255));
-y_im_f=find(~(y_mean==255));
-im_corr_cut=im_corr(x_im_f(1):x_im_f(length(x_im_f)),y_im_f(1):y_im_f(length(y_im_f)),:);
-[y_im_corr_cut,x_im_corr_cut,depth]=size(im_corr_cut);
-im1_resized=imresize(im1_inv,[y_im_corr_cut,x_im_corr_cut]);
-im_corr_resized=imresize(im_corr_cut,size(im));
-imwrite(im_corr_resized,out);
+for cout = {out2 out}
+    im_corr = imread(cout{1});
+    im_bw   = mean(im_corr,3);
+    x_mean=mean(im_bw,2);
+    y_mean=mean(im_bw,1);
+    x_im_f=find(~(x_mean==255));
+    y_im_f=find(~(y_mean==255));
+    im_corr_cut = im_corr(x_im_f(1):x_im_f(length(x_im_f)),y_im_f(1):y_im_f(length(y_im_f)),:);
+    [y_im_corr_cut,x_im_corr_cut,depth]=size(im_corr_cut);
+    im1_resized=imresize(im1_inv,[y_im_corr_cut,x_im_corr_cut]);
+    im_corr_resized=imresize(im_corr_cut,size(im));
+    imwrite(im_corr_resized,cout{1});
+end
 %finally get an overlay with the original image, to give the structural information!!
 im1_inv_d(:,:,1)=double(im1_inv);im1_inv_d(:,:,2)=double(im1_inv);im1_inv_d(:,:,3)=double(im1_inv);
 im1_inv_resize=im1_inv_d(x_shift+1:end,y_shift+1:end,:);
