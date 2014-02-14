@@ -22,7 +22,7 @@ function varargout = collagen_flow_GUI(varargin)
 
 % Edit the above text to modify the response to help collagen_flow_GUI
 
-% Last Modified by GUIDE v2.5 28-Nov-2013 11:39:22
+% Last Modified by GUIDE v2.5 14-Feb-2014 13:22:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -554,6 +554,15 @@ function handles=detect_edge(hObject, eventdata, handles)
 
     % Hints: get(hObject,'Value') returns position of slider
     %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    
+    %%%
+    % does something for edge detection, and does modify handle
+    % but what the fuck does it do.
+    
+    %%%
+    
+    doEdgeDetect = get(handles.doEdgeDetect,'Value');
+    
     curr=round(get(handles.slider1,'Value'));
     set(handles.text1,'String',['Image: ',num2str(curr)]);
     axes(handles.image);
@@ -563,79 +572,83 @@ function handles=detect_edge(hObject, eventdata, handles)
     imshow(im);
     guidata(hObject, handles);
 
+    if(doEdgeDetect == 1.0)
+        axes(handles.edge);
+        level = graythresh(im);
 
-    axes(handles.edge);
-    level = graythresh(im);
+        %size_g=55;%size of the gaussian kernel
+        size_g=str2double(get(handles.size_er,'String'));
+        sig=1;%sigma of the gaussian kernel
+        d=10;%edge rechtalnges to compensate inhomogenous illumination
+        %t=1;%should I invert?
+        t=get(handles.invert_image,'Value');
+        ones1=5;%first imclose, removes smal particle
+        %ones2=50;%second imclose, removes particles at the end of procedure and clese the contour
+        ones2=str2double(get(handles.size_dil,'String'));
+        %min_size=50;%remove particles after threshold
+        min_size=str2double(get(handles.remove_edge_p,'String'));
 
-    %size_g=55;%size of the gaussian kernel
-    size_g=str2num(get(handles.size_er,'String'));
-    sig=1;%sigma of the gaussian kernel
-    d=10;%edge rechtalnges to compensate inhomogenous illumination
-    %t=1;%should I invert?
-    t=get(handles.invert_image,'Value');
-    ones1=5;%first imclose, removes smal particle
-    %ones2=50;%second imclose, removes particles at the end of procedure and clese the contour
-    ones2=str2num(get(handles.size_dil,'String'));
-    %min_size=50;%remove particles after threshold
-    min_size=str2num(get(handles.remove_edge_p,'String'));
-
-    axes(handles.gran);
-    %I want that center is bright, so inverse if necessary
-    if t==1
-        im=double(im);
-        %im=uint16((im-2^16)*-1);
-        im=uint8((im-2^8)*-1);
+        axes(handles.gran);
+        %I want that center is bright, so inverse if necessary
+        if t==1
+            im=double(im);
+            %im=uint16((im-2^16)*-1);
+            im=uint8((im-2^8)*-1);
 
 
+        end
+
+        %Now I correct for assymtric illumination. I take the corners and
+        %intermolate a map for normalisation
+
+        [x,y]=size(im);
+        I(1,1)=mean(reshape(im(1:d,1:d),1,d^2));
+        I(2,2)=mean(reshape(im(x-d+1:x,y-d+1:y),1,d^2));
+        I(2,1)=mean(reshape(im(1:d,y-d+1:y),1,d^2));
+        I(1,2)=mean(reshape(im(x-d+1:x,1:d),1,d^2));
+
+        %now I interpolare the normalisation matrix
+        [X,Y] = meshgrid(1:x-1:x,1:y-1:y);
+        Z = I;
+        [XI,YI] = meshgrid(1:x,1:y);
+        ZI = interp2(X,Y,Z,XI,YI);
+
+        %now I normalize the image
+        %make sure the image is 8bit
+        im=uint8(im);
+        im_n=im-(uint8(ZI')-min(min(ZI)));
+
+        %# Create the gaussian filter with hsize = [5 5] and sigma = 2
+        G = fspecial('gaussian',[size_g size_g],sig);
+        %# Filter it
+        im_blur = imfilter(im_n,G,'same');
+        % now threshold
+        graythresh(im_blur)
+        im_th=im2bw(im_blur, graythresh(im_blur));
+
+        %now I clean up
+        bw2 = imfill(im_th,'holes');
+        %bw3 = imopen(bw2, ones(ones1,ones1));
+        bw3 = imopen(im_th, ones(ones1,ones1));
+        bw4 = bwareaopen(bw3, min_size);
+        bw4b=(imclose(bw4,ones(ones2,ones2)));
+        bw5=(imfill(bw4b,'holes'));
+        imshow(im_n)
+        %finally remove all particles that don't take up half of the total white
+        %pixels numbers
+        bw6= bwareaopen(bw5, round(sum(sum(bw5))/2));
+
+        bw6_perim = bwperim(bw6);
+        overlay1 = imoverlay(im, bw6_perim, [1 0 0]);
+
+        axes(handles.image);
+        imshow(overlay1);
+        handles.BW2=(bw6-1)*-1;
+    else
+        handles.BW2=im*0+1;
     end
 
-    %Now I correct for assymtric illumination. I take the corners and
-    %intermolate a map for normalisation
-
-    [x,y]=size(im);
-    I(1,1)=mean(reshape(im(1:d,1:d),1,d^2));
-    I(2,2)=mean(reshape(im(x-d+1:x,y-d+1:y),1,d^2));
-    I(2,1)=mean(reshape(im(1:d,y-d+1:y),1,d^2));
-    I(1,2)=mean(reshape(im(x-d+1:x,1:d),1,d^2));
-
-    %now I interpolare the normalisation matrix
-    [X,Y] = meshgrid(1:x-1:x,1:y-1:y);
-    Z = I;
-    [XI,YI] = meshgrid(1:x,1:y);
-    ZI = interp2(X,Y,Z,XI,YI);
-
-    %now I normalize the image
-    %make sure the image is 8bit
-    im=uint8(im);
-    im_n=im-(uint8(ZI')-min(min(ZI)));
-
-    %# Create the gaussian filter with hsize = [5 5] and sigma = 2
-    G = fspecial('gaussian',[size_g size_g],sig);
-    %# Filter it
-    im_blur = imfilter(im_n,G,'same');
-    % now threshold
-    graythresh(im_blur)
-    im_th=im2bw(im_blur, graythresh(im_blur));
-
-    %now I clean up
-    bw2 = imfill(im_th,'holes');
-    %bw3 = imopen(bw2, ones(ones1,ones1));
-    bw3 = imopen(im_th, ones(ones1,ones1));
-    bw4 = bwareaopen(bw3, min_size);
-    bw4b=(imclose(bw4,ones(ones2,ones2)));
-    bw5=(imfill(bw4b,'holes'));
-    imshow(im_n)
-    %finally remove all particles that don't take up half of the total white
-    %pixels numbers
-    bw6= bwareaopen(bw5, round(sum(sum(bw5))/2));
-
-    bw6_perim = bwperim(bw6);
-    overlay1 = imoverlay(im, bw6_perim, [1 0 0]);
-
-    axes(handles.image);
-    imshow(overlay1);
-
-    handles.BW2=(bw6-1)*-1;
+    
     handles.im_e=im;
 
     guidata(hObject, handles);
@@ -1297,3 +1310,12 @@ function edit_length_scale_unit_CreateFcn(hObject, eventdata, handles)
     handles.length_scale_unit = 1e6;
     handles.length_scale_str = 'm';
     guidata(hObject, handles);
+
+
+% --- Executes on button press in doEdgeDetect.
+function doEdgeDetect_Callback(hObject, eventdata, handles)
+% hObject    handle to doEdgeDetect (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of doEdgeDetect
