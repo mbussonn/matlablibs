@@ -463,10 +463,10 @@ function handles=correlate_im(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-gd=str2num(get(handles.g_dist,'String'));
-gs=str2num(get(handles.s_source,'String'));
-ss=str2num(get(handles.s_search,'String'));
-c_th=str2num(get(handles.c_thresh,'String'));
+gd=str2double(get(handles.g_dist,'String'));
+gs=str2double(get(handles.s_source,'String'));
+ss=str2double(get(handles.s_search,'String'));
+c_th=str2double(get(handles.c_thresh,'String'));
 
 
 curr=round(get(handles.slider1,'Value'));
@@ -1251,7 +1251,7 @@ function edit_time_scale_unit_Callback(hObject, eventdata, handles)
             handles.time_scale_str = 'hour';
         case 'minute'
             handles.time_scale_unit = 1;
-            handles.time_scale_str = 'minutes';
+            handles.time_scale_str = 'minute';
         case 'second'
             handles.time_scale_unit = 1/60;
             handles.time_scale_str = 'second';

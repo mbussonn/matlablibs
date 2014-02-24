@@ -124,7 +124,19 @@ x_flow=x_flow_i;y_flow=y_flow_i;
 r_flow(isnan(r_flow))=0;
 %r_flow=r_flow(x_shift+1:end,y_shift+1:end);
 imshow(r_flow/length_scale_unit*time_scale_unit)
+colormap('gray')
+set(gca,'CLim',[0,max_r_flow/length_scale_unit*time_scale_unit])
+display(max_r_flow/length_scale_unit*time_scale_unit)
+
+
+mkdir([rf_path,filesep,'gray-scale']);
+
+out0=[rf_path,filesep,'gray-scale',filesep, num2str(index+1000),'grayscale.png'];
+print(h,'-dpng','-r150',out0);
+
+
 colormap('jet')
+
 set(gca,'CLim',[0,max_r_flow/length_scale_unit*time_scale_unit])
 display(max_r_flow/length_scale_unit*time_scale_unit)
 hold on
@@ -133,7 +145,7 @@ hold on
 plot_data=generate_plot_normalized(x_flow,y_flow,flow_field_arrow_distance);
 hold on
 
-out=[rf_path,'/filtered_overlay_im','/all_overlay',num2str(index+1000),'all_filt.png'];
+out=[rf_path,filesep,'filtered_overlay_im',filesep,'all_overlay',num2str(index+1000),'all_filt.png'];
 print(h,'-dpng','-r150',out);
 
 quiver(plot_data(:,1),plot_data(:,2),plot_data(:,3),plot_data(:,4),0.3,'k');
@@ -151,7 +163,7 @@ fill([x_max-x_shift-5-10/mue2pix_ratio,x_max-x_shift-5-10/mue2pix_ratio,x_max-5-
 %Save the images, the display_edge_array, and of course the final_results_out
 
 %now correct for the stupid matlab exporting and resizeing
-for cout = {out2 out}
+for cout = {out2 out out0}
     im_corr = imread(cout{1});
     im_bw   = mean(im_corr,3);
     x_mean=mean(im_bw,2);
