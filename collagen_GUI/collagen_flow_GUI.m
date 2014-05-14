@@ -557,7 +557,7 @@ function handles=detect_edge(hObject, eventdata, handles)
     guidata(hObject, handles);
 
     if(doEdgeDetect == 1.0)
-        axes(handles.edge);
+        axes(handles.color_code);
         level = graythresh(im);
 
         %size_g=55;%size of the gaussian kernel
