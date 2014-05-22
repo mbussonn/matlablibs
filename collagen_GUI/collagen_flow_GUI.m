@@ -63,6 +63,7 @@ function collagen_flow_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.d_path='C:/'
     
     %make sure that the units are updated
+    set(handles.edit_length_scale_unit,'String',{'m','mm','µm','nm'})
     handles.time_scale_unit = 60;
     handles.time_scale_str = 'hour';
             handles.length_scale_unit = 1;
